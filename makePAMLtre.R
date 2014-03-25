@@ -7,6 +7,7 @@ library(R.utils)
 args <- commandArgs(trailingOnly = TRUE)
 
 infile <- args[2]
+treefile <- args[4]
 
 tmp <- read.table(infile)
 
@@ -22,7 +23,7 @@ for (i in Taxa){
     NodeList<- c(NodeList, ind.2)
 }
 
-tmptree <- read.tree("treefile.txt")
+tmptree <- read.tree(treefile)
 pruned.tree<-drop.tip(tmptree,tmptree$tip.label[-match(NodeList, tmptree$tip.label)])
 #make name that matches infile name
 outfile <- paste(infile, ".tre", sep='')
