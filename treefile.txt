@@ -1,0 +1,13 @@
+(((((12, 3), (1, (9, 8))), 2), (7, 6)), 11, (4, (5, 10)));
+1 Dmel
+2 Dana
+3 Dere
+4 Dgri
+5 Dmoj
+6 Dper
+7 Dpse
+8 Dsec
+9 Dsim
+10 Dvir
+11 Dwil
+12 Dyak
