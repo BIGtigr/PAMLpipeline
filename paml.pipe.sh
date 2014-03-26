@@ -66,6 +66,7 @@ do
     fi
     chmod +x $PAMLfile #make the .ctl script executable
 #    ./$PAMLfile #run PAML
+# to delete files add rm filename
 done
 
 #clean up
