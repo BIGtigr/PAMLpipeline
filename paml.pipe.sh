@@ -42,7 +42,7 @@ M8aPar="fix_omega = 1  *1: omega or omega_1 fixed, 0: estimate\nomega = 1  *init
 M8Par="fix_omega = 0  *1: omega or omega_1 fixed, 0: estimate\nomega = 1  *initial or fixed omega, for codons or codon-based AAs"
 
 AlignFileArr=(`ls $AlignFolder`)
-echo ${AlignFileArr[@]}
+#echo ${AlignFileArr[@]}
 
 #Loop through files in the alignment folder
 for file in ${AlignFileArr[@]}; 
