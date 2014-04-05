@@ -34,6 +34,9 @@ AlignFolder=$1
 Model=$2
 TreeFile=$3
 
+#path to Rscript for making trees
+RscriptPath="/home/sjosway/Programs/paml/PAMLpipeline/makePAMLtre.R"
+
 #PAML parameters not corresponding to model
 CodeMlPar="\nnoisy = 9  *0,1,2,3,9: how much rubbish on the screen\nverbose = 1  *0: concise; 1: detailed, 2: too much\nrunmode = 0  *0: user tree;  1: semi-automatic;  2: automatic\n\t*3: StepwiseAddition; (4,5):PerturbationNNI; -2: pairwise\n\nseqtype = 1  *1:codons; 2:AAs; 3:codons-->AAs\nCodonFreq = 2  *0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table\n\nmodel = 0 *models for codons:\n\t*0:one, 1:b, 2:2 or more dN/dS ratios for branches\n\t*models for AAs or codon-translated AAs:\n\t*0:poisson, 1:proportional, 2:Empirical, 3:Empirical+F\n\t*6:FromCodon, 7:AAClasses, 8:REVaa_0, 9:REVaa(nr=189)\n\nNSsites = 8 *0:one w;1:neutral;2:selection; 3:discrete;4:freqs;\n\t*5:gamma;6:2gamma;7:beta;8:beta&w;9:beta&gamma;\n\t*10:beta&gamma+1; 11:beta&normal>1; 12:0&2normal>1;\n\t*13:3normal>0\n\nfix_kappa = 0  *1: kappa fied, 0: kappa to be estimated\nkappa = 2  *initial or fixed kappa\n"
 
@@ -44,6 +47,9 @@ M8Par="fix_omega = 0  *1: omega or omega_1 fixed, 0: estimate\nomega = 1  *initi
 AlignFileArr=(`ls $AlignFolder`)
 echo ${AlignFileArr[@]}
 
+StatFile=$1"/paml-stats.out" #name out file
+echo "gene id, model, lnL, kappa" >> $StatFile
+ 
 #Loop through files in the alignment folder
 for file in ${AlignFileArr[@]}; 
 do 
@@ -51,10 +57,12 @@ do
     outfile=$myfile"."$Model".paml.out" #create name for output file: infile.paml.out 
     PAMLfile=$myfile.ctl #create name for PAML .ctl script file: infile.ctl
 	FixLineNum $myfile #fix the sequence number in the alignment header
-    Rscript makePAMLtre.R --infile $myfile --treefile $TreeFile > R.out.tmp 2>&1 #generate the correct tree file for the taxa in the alignment
+    sed -i 's/\t/  /' $myfile #remove tabs from alignment file 
+	Rscript $RscriptPath --infile $myfile --treefile $TreeFile > R.out.tmp #2>&1 #generate the correct tree file for the taxa in the alignment
     #create the PAML .ctl script 
     echo "seqfile = "$myfile > $PAMLfile
-    echo "treefile = "$TreeFile >> $PAMLfile
+    newTree=$myfile".tre"
+    echo "treefile = "$newTree >> $PAMLfile
     echo "outfile = "$outfile >> $PAMLfile
     echo -e $CodeMlPar >> $PAMLfile
     if [ "$Model" = "M8a" ] 
@@ -63,11 +71,9 @@ do
     elif [ "$Model" == "M8" ]
     then
         echo -e $M8Par >> $PAMLfile
-    fi
-    chmod +x $PAMLfile #make the .ctl script executable
-#    ./$PAMLfile #run PAML
+    fi   
+	mygene="${file%%.*}"
+	codeml $PAMLfile && mylnL=`grep "lnL(ntime" $outfile | awk '{ print $5}'` && mykappa=`grep "kappa" $outfile | awk '{ print $4}'` && echo $mygene","$Model"," $mylnL","$mykappa >> $StatFile
 done
-
 #clean up
-rm R.out.tmp
-
+#rm R.out.tmp
