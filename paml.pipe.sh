@@ -45,7 +45,7 @@ M8aPar="fix_omega = 1  *1: omega or omega_1 fixed, 0: estimate\nomega = 1  *init
 M8Par="fix_omega = 0  *1: omega or omega_1 fixed, 0: estimate\nomega = 1  *initial or fixed omega, for codons or codon-based AAs"
 
 AlignFileArr=(`ls $AlignFolder`)
-echo ${AlignFileArr[@]}
+#echo ${AlignFileArr[@]}
 
 StatFile=$1"/paml-stats.out" #name out file
 echo "gene id, model, lnL, kappa" >> $StatFile
@@ -71,9 +71,16 @@ do
     elif [ "$Model" == "M8" ]
     then
         echo -e $M8Par >> $PAMLfile
+<<<<<<< HEAD
     fi   
 	mygene="${file%%.*}"
 	codeml $PAMLfile && mylnL=`grep "lnL(ntime" $outfile | awk '{ print $5}'` && mykappa=`grep "kappa" $outfile | awk '{ print $4}'` && echo $mygene","$Model"," $mylnL","$mykappa >> $StatFile
+=======
+    fi
+    chmod +x $PAMLfile #make the .ctl script executable
+#    ./$PAMLfile #run PAML
+# to delete files add rm filename
+>>>>>>> 63a5e6a06b8fe4874baa0e38369d0265d283bee5
 done
 #clean up
 #rm R.out.tmp
